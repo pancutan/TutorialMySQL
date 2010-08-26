@@ -144,10 +144,10 @@ CREATE TABLE telefonos (
         -- Creamos un campo con la misma dimensión (4) del id de autores
         autor_id INT(4),
 
-        -- Ahora creamos un indice llamado autores_indice, que utiliza autor_id
+        -- Ahora creamos un indice llamado telefonos_autor_indice, que utiliza autor_id
         -- Es lo que se llama clave o campo ajeno. Para avisar que tambien es clave (KEY)
         -- pero no de esta tabla, le llamamos INDEX
-        INDEX autores_indice (autor_id),
+        INDEX telefonos_autor_indice (autor_id),
 
         FOREIGN KEY (autor_id) 
         REFERENCES autores(id)
@@ -156,6 +156,7 @@ CREATE TABLE telefonos (
         -- eficiente hacerlo aqui que mediante lenguaje de programación
 
         ON DELETE CASCADE
+        ON UPDATE CASCADE
 
         -- Experimento interesante: cambiar CASCADE por RESTRICT
         -- Podrá comprobar que un autor no puede ser borrado hasta que todos 
@@ -170,9 +171,17 @@ INSERT INTO telefonos (id,telefono,autor_id) VALUES (NULL,'02262 224222',2);
 INSERT INTO telefonos (id,telefono,autor_id) VALUES (NULL,'011 155072289',2);
 
 -- Cuantos telefonos tiene Sabato?
-SELECT nombre,apellido,telefono FROM autores,telefonos WHERE apellido LIKE 'Sabato';
+SELECT * FROM autores,telefonos WHERE apellido LIKE 'Sabato';
 
--- Borramos a Sabato
+-- Probemos ahora si funciona el ON UPDATE CASCADE. Sabato tiene 2 en el id. Lo cambiamos por 9       
+UPDATE `autores` SET `id`=9 WHERE `id`=2; 
+
+-- Repetimos el ultimo select ...
+SELECT * FROM autores,telefonos WHERE apellido LIKE 'Sabato';
+
+-- Sorpresa! cambiaron los id relacionados!!
+
+-- Ahora, para probar el ON DELETE CASCADE, borramos a Sabato
 DELETE FROM autores WHERE apellido LIKE 'Sabato';
 
 -- Sabato no existe mas
@@ -193,14 +202,22 @@ CREATE TABLE libros (
 
 -- Ahora la tabla relación
 
-
+/*
 CREATE TABLE autores_escriben_libros (
   id INT(6) NOT NULL PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
   autor_id INT(4) NOT NULL,
-  libro_id INT(5) NOT NULL
+  libro_id INT(5) NOT NULL,
 
+  -- Creamos un indice basado en autor_id
+  INDEX autor_escriben_libros_indice1 (autor_id),
+
+  -- Anunciamos que este nuevo indice es ajeno, y que se corresponde con otra tabla
+  FOREIGN KEY (autor_id) REFERENCES autores(id)
+  ON DELETE
 
 );
+
+*/
 
 /* Ejemplo
 CREATE TABLE parent(
