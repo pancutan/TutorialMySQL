@@ -263,8 +263,4 @@ SELECT libros.titulo
 DELETE FROM autores WHERE id=1;
 
 2) Introduzca los cambios necesarios para que no se puedan borrar libros que figuren escritos por alguien
-
-
-
-
-
+*/
