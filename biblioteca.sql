@@ -195,50 +195,40 @@ SELECT * FROM telefonos;
 
 CREATE TABLE libros (
 
-  id INT(5) NOT NULL PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+  id INT(5) NOT NULL PRIMARY KEY UNIQUE AUTO_INCREMENT,
   titulo VARCHAR(100)
 
 ) ENGINE=INNODB;
 
+INSERT INTO libros (id,titulo) VALUES (NULL,'Martin Fierro'),
+                                      (NULL,'Los 33 Orientales'),
+                                      (NULL,'Vida del Chacho')
+                                      ;
+
+SELECT * FROM libros;
+
 -- Ahora la tabla relación
 
-/*
+
 CREATE TABLE autores_escriben_libros (
   id INT(6) NOT NULL PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
-  autor_id INT(4) NOT NULL,
-  libro_id INT(5) NOT NULL,
+  autor_id INT(4),
+  libro_id INT(5) ,
 
   -- Creamos un indice basado en autor_id
   INDEX autor_escriben_libros_indice1 (autor_id),
 
-  -- Anunciamos que este nuevo indice es ajeno, y que se corresponde con otra tabla
-  FOREIGN KEY (autor_id) REFERENCES autores(id)
-  ON DELETE
+     -- Anunciamos que este nuevo indice es ajeno, y que se corresponde con otra tabla
+     FOREIGN KEY (autor_id) REFERENCES autores(id)
 
-);
+     -- No permitimos borrar autores que hayan escrito libros
+     ON DELETE RESTRICT 
 
-*/
+     -- Si cambia el id de un autor, cambia tambien el autor_id de esta tabla
+     ON UPDATE CASCADE
 
-/* Ejemplo
-CREATE TABLE parent(
-  id INT NOT NULL,
-  PRIMARY KEY (id)
-) ENGINE=INNODB;
-
-CREATE TABLE child(
-  id INT, 
-  parent_id INT,
-  INDEX par_ind (parent_id),
-  FOREIGN KEY (parent_id) 
-    REFERENCES parent(id) 
-    ON DELETE CASCADE
-) ENGINE=INNODB;
-
-*/
-
-
--- Veo las claves que posee la tabla
-
+     
+) ENGINE = INNODB;
 
 
 /* Veo las claves AJENAS que posee la tabla
@@ -252,3 +242,29 @@ SELECT TABLE_NAME,
     DELETE_RULE,
     UPDATE_RULE
     FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS;
+
+
+-- Relacionamos a José Hernandez, cuyo id es 1, a los 3 libros existentes
+INSERT INTO autores_escriben_libros (id, autor_id, libro_id) VALUES 
+    (NULL,1,1), 
+    (NULL,1,2), 
+    (NULL,1,3);
+
+-- Qué libros escribió José Hernandez?
+SELECT libros.titulo 
+   FROM libros,autores 
+   WHERE autores.nombre LIKE 'Jose' AND 
+         autores.apellido = 'Hernandez';
+
+/* Ejercicios:
+
+1) Borre a Jose Hernandez si es guapo: descomente la siguiente línea:
+
+DELETE FROM autores WHERE id=1;
+
+2) Introduzca los cambios necesarios para que no se puedan borrar libros que figuren escritos por alguien
+
+
+
+
+
